@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme -->
+    <style name="Theme.TrucoLogin" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/red</item>
+        <item name="colorPrimaryDark">@color/darker_red</item>
+        <item name="colorAccent">@color/white</item>
+
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+</resources>

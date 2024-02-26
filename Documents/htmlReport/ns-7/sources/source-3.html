@@ -1,0 +1,103 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CardRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: CardRepository (com.backend.backend.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">CardRepository$MockitoMock$KoEjVA5v</td>
+  </tr>
+  <tr>
+    <td class="name">CardRepository$MockitoMock$KoEjVA5v$auxiliary$0d26PkCB</td>
+  </tr>
+  <tr>
+    <td class="name">CardRepository$MockitoMock$KoEjVA5v$auxiliary$dBVTIV8E</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.repository;
+&nbsp;
+&nbsp;import com.backend.backend.model.Card;
+&nbsp;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.Query;
+&nbsp;import org.springframework.data.repository.query.Param;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;
+&nbsp;public interface CardRepository extends JpaRepository&lt;Card, Long&gt; {
+&nbsp;
+&nbsp;    //returns players cards in hand
+&nbsp;    @Query(&quot;SELECT c FROM Card c WHERE c.player.id = :playerId AND c.game.id = :gameId&quot;)
+&nbsp;    List&lt;Card&gt; findCardsByPlayerIdAndGameId(@Param(&quot;playerId&quot;) Long playerId, @Param(&quot;gameId&quot;) Long gameId);
+&nbsp;
+&nbsp;    //returns which cards have been played
+&nbsp;    @Query(&quot;SELECT c FROM Card c WHERE c.cardPlayed = true AND c.game.id = :gameId&quot;)
+&nbsp;    List&lt;Card&gt; cardsPlayed(@Param(&quot;gameId&quot;) Long gameId);
+&nbsp;
+&nbsp;    @Query(&quot;SELECT c FROM Card c WHERE c.cardPlayed = true AND c.game.id = :gameId AND c.player = :player&quot;)
+&nbsp;    Card cardPlayedby(@Param(&quot;gameId&quot;) Long gameId, @Param(&quot;player&quot;) Long player);
+&nbsp;}
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:57</div>
+</div>
+</body>
+</html>

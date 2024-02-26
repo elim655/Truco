@@ -1,0 +1,459 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TrucoGameService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: TrucoGameService (com.backend.backend.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TrucoGameService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/158)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.controller;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Random;
+&nbsp;
+&nbsp;import com.backend.backend.model.*;
+&nbsp;import com.backend.backend.repository.*;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import jakarta.persistence.EntityNotFoundException;
+&nbsp;import jakarta.transaction.Transactional;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;public class TrucoGameService {</b>
+&nbsp;    @Autowired
+&nbsp;    GameRepository gameRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    UserRepository userRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    CardRepository cardRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    DeckRepository deckRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    PlayerRepository playerRepository;
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Initalize a 1v1 game&quot;, description = &quot;Creates a game between 2 players&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public Long initialize1v1Game(String player1, String player2) {
+<b class="nc">&nbsp;        Game game = new Game();</b>
+<b class="nc">&nbsp;        game.setMode(Mode.ONEVONE);</b>
+<b class="nc">&nbsp;        game.setDeck(new Deck(game));</b>
+<b class="nc">&nbsp;        game.setState(State.NORMAL);</b>
+<b class="nc">&nbsp;        game.setRound(1);</b>
+<b class="nc">&nbsp;        game.setWinner(0);</b>
+&nbsp;
+&nbsp;        // Retrieve players from the repository
+<b class="nc">&nbsp;        Player p1 = playerRepository.findByPlayerName(player1);</b>
+<b class="nc">&nbsp;        Player p2 = playerRepository.findByPlayerName(player2);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (p1 == null || p2 == null) {</b>
+&nbsp;            // Handle the case where either player1 or player2 is not found
+&nbsp;            // You can return an error or handle it as appropriate for your application
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Initialize the cards list for player 1 and player 2
+<b class="nc">&nbsp;        p1.setCards(new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;        p2.setCards(new ArrayList&lt;&gt;());</b>
+&nbsp;
+&nbsp;        // Save players to generate their IDs
+<b class="nc">&nbsp;        playerRepository.save(p1);</b>
+<b class="nc">&nbsp;        playerRepository.save(p2);</b>
+&nbsp;
+<b class="nc">&nbsp;        Random rand = new Random();</b>
+<b class="nc">&nbsp;        if (rand.nextInt(2) == 0) {</b>
+<b class="nc">&nbsp;            game.setTurn(p1.getId());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            game.setTurn(p2.getId());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Player&gt; players = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        players.add(p1);</b>
+<b class="nc">&nbsp;        players.add(p2);</b>
+<b class="nc">&nbsp;        game.setPlayers(players);</b>
+<b class="nc">&nbsp;        p1.setGame(game);</b>
+<b class="nc">&nbsp;        p2.setGame(game);</b>
+<b class="nc">&nbsp;        gameRepository.save(game);</b>
+&nbsp;
+&nbsp;        // Draw and assign cards to player1 and player2
+<b class="nc">&nbsp;        for (int i = 0; i &lt; 3; i++) {</b>
+<b class="nc">&nbsp;            Card card1 = drawCard(game.getDeck().getId());</b>
+<b class="nc">&nbsp;            p1.getCards().add(card1);</b>
+<b class="nc">&nbsp;            card1.setPlayer(p1);</b>
+<b class="nc">&nbsp;            cardRepository.save(card1);</b>
+&nbsp;
+<b class="nc">&nbsp;            Card card2 = drawCard(game.getDeck().getId());</b>
+<b class="nc">&nbsp;            p2.getCards().add(card2);</b>
+<b class="nc">&nbsp;            card2.setPlayer(p2);</b>
+<b class="nc">&nbsp;            cardRepository.save(card2);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        playerRepository.save(p1);</b>
+<b class="nc">&nbsp;        playerRepository.save(p2);</b>
+<b class="nc">&nbsp;        return game.getId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    // Initialize 2v2 game
+&nbsp;    public void initialize2v2Game(String player1, String player2, String player3, String player4) {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public Card drawCard(Long deckId) {
+&nbsp;        // Assuming deckRepository is your JPA repository for Deck
+<b class="nc">&nbsp;        Deck deck = deckRepository.findById(deckId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Deck not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (deck.getCards().isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Cannot draw from an empty deck.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Card card = deck.getCards().remove(deck.getCards().size() - 1);</b>
+<b class="nc">&nbsp;        card.setDeck(null); // If you want to dissociate the card from the deck</b>
+<b class="nc">&nbsp;        cardRepository.save(card);</b>
+&nbsp;
+&nbsp;        // You would also need to save the state of the deck
+<b class="nc">&nbsp;        deckRepository.save(deck);</b>
+&nbsp;
+<b class="nc">&nbsp;        return card;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Play a card&quot;, description = &quot;A player plays a card and it is removed from their hand, only if it is their turn&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void playCard(Long gameId, String playerName, Card card) {
+&nbsp;        // Retrieve the game state
+<b class="nc">&nbsp;        Game game = gameRepository.findById(gameId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Game not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        Player currentPlayer = game.getPlayers().stream()</b>
+<b class="nc">&nbsp;                .filter(player -&gt; player.getPlayerName().equals(playerName))</b>
+<b class="nc">&nbsp;                .findFirst()</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Player not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cardRepository.cardsPlayed(game.getId()).size() &gt;= 2) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Both players already played a card.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Objects.equals(currentPlayer.getId(), game.getTurn())) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;It&#39;s not the player&#39;s turn&quot;);</b>
+&nbsp;        } else {
+&nbsp;            // Perform actions when it&#39;s the player&#39;s turn
+<b class="nc">&nbsp;            card.setCardPlayed(true);</b>
+<b class="nc">&nbsp;            card.setGame(game);</b>
+<b class="nc">&nbsp;            card.setPlayer(currentPlayer);</b>
+<b class="nc">&nbsp;            cardRepository.save(card);</b>
+&nbsp;
+&nbsp;            // Switch the turn to the other player
+<b class="nc">&nbsp;            Long otherPlayerId = game.getPlayers().stream()</b>
+<b class="nc">&nbsp;                    .filter(player -&gt; !player.getId().equals(currentPlayer.getId()))</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .map(Player::getId)</b>
+<b class="nc">&nbsp;                    .orElseThrow(() -&gt; new IllegalStateException(&quot;Other player not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            game.setTurn(otherPlayerId); // Set the turn to the other player&#39;s ID</b>
+&nbsp;
+&nbsp;            //if after a player plays a card and their and becomes empty then deal them 3 new cards from the deck
+<b class="nc">&nbsp;            if(cardRepository.findCardsByPlayerIdAndGameId(currentPlayer.getId(), gameId).isEmpty()){</b>
+<b class="nc">&nbsp;                for(int i = 0; i &lt; 3; i++){</b>
+<b class="nc">&nbsp;                    Card newCard = drawCard(game.getDeck().getId());</b>
+<b class="nc">&nbsp;                    List&lt;Card&gt; cards = currentPlayer.getCards();</b>
+<b class="nc">&nbsp;                    cards.add(newCard); // Now this should not throw NullPointerException</b>
+<b class="nc">&nbsp;                    newCard.setPlayer(currentPlayer);</b>
+<b class="nc">&nbsp;                    cardRepository.save(newCard);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Save the changes to the game and player
+<b class="nc">&nbsp;            gameRepository.save(game);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Card compareCard(Long gameID) {
+<b class="nc">&nbsp;        List&lt;Card&gt; cards = cardRepository.cardsPlayed(gameID);</b>
+<b class="nc">&nbsp;        Game game = gameRepository.findById((long) gameID)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Game not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cards.size() &lt; 2) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Not enough cards played to compare.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int round = game.getRound() + 1;</b>
+<b class="nc">&nbsp;        game.setRound(round);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cards.get(0).getValue() &gt; cards.get(1).getValue()) {</b>
+<b class="nc">&nbsp;            int points = cards.get(0).getPlayer().getPoints();</b>
+<b class="nc">&nbsp;            points += awardPoints( gameID);</b>
+&nbsp;
+<b class="nc">&nbsp;            cards.get(0).getPlayer().setPoints(points);</b>
+&nbsp;
+<b class="nc">&nbsp;            cardRepository.delete(cards.get(0));</b>
+<b class="nc">&nbsp;            cardRepository.delete(cards.get(1));</b>
+<b class="nc">&nbsp;            game.setState(State.NORMAL);</b>
+<b class="nc">&nbsp;            return cards.get(0);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            int points = cards.get(1).getPlayer().getPoints();</b>
+<b class="nc">&nbsp;            points += awardPoints( gameID);</b>
+&nbsp;
+<b class="nc">&nbsp;            cards.get(1).getPlayer().setPoints(points);</b>
+&nbsp;
+<b class="nc">&nbsp;            cardRepository.delete(cards.get(0));</b>
+<b class="nc">&nbsp;            cardRepository.delete(cards.get(1));</b>
+<b class="nc">&nbsp;            game.setState(State.NORMAL);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            return cards.get(1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void callFlor(Long gameID,String player){
+<b class="nc">&nbsp;        List&lt;Card&gt; cards = cardRepository.findCardsByPlayerIdAndGameId(playerRepository.findByPlayerName(player).getId(), gameID);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cards.get(0).getSuit().equals(cards.get(1).getSuit()) &amp;&amp; cards.get(0).getSuit().equals(cards.get(2).getSuit())){</b>
+<b class="nc">&nbsp;            int points = cards.get(0).getPlayer().getPoints();</b>
+<b class="nc">&nbsp;            points +=4;</b>
+<b class="nc">&nbsp;            cards.get(1).getPlayer().setPoints(points);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        switchTurns(gameID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void switchTurns(Long gameId){
+<b class="nc">&nbsp;        Game game = gameRepository.findById((long) gameId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Game not found&quot;));</b>
+<b class="nc">&nbsp;        Player player1 = game.getPlayers().get(0);</b>
+<b class="nc">&nbsp;        Player player2 = game.getPlayers().get(1);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(Objects.equals(game.getTurn(), player1.getId())){</b>
+<b class="nc">&nbsp;            game.setTurn(player2.getId());</b>
+&nbsp;        }else{
+<b class="nc">&nbsp;            game.setTurn(player1.getId());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkForWinner(Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById(gameID)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //check turn
+&nbsp;    public void callTruco(Boolean desc, Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+<b class="nc">&nbsp;        if (desc) {</b>
+<b class="nc">&nbsp;            game.setState(State.TRUCO);</b>
+&nbsp;            //winner gets 2 points
+&nbsp;        } else {
+<b class="nc">&nbsp;            awardPoints(gameID);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Award points&quot;, description = &quot;Determines how many points to give based off the current state of the game&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    private int awardPoints(Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+<b class="nc">&nbsp;        if(game.getState() == State.NORMAL){</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(game.getState() == State.TRUCO){</b>
+<b class="nc">&nbsp;            return 2;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(game.getState() == State.RETRUCO){</b>
+<b class="nc">&nbsp;            return 3;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(game.getState() == State.VALECUATRO){</b>
+<b class="nc">&nbsp;            return 4;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(game.getState() == State.ENVIDO){</b>
+<b class="nc">&nbsp;            return 2;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(game.getState() == State.REAL_ENVIDO){</b>
+<b class="nc">&nbsp;            return 4;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void callReTruco(Boolean desc, Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+<b class="nc">&nbsp;        if (desc) {</b>
+<b class="nc">&nbsp;            game.setState(State.RETRUCO);</b>
+&nbsp;            //winner gets 3 points
+&nbsp;        } else {
+<b class="nc">&nbsp;            awardPoints(gameID);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void callValeQuatro(Boolean desc, Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+<b class="nc">&nbsp;        if (desc) {</b>
+<b class="nc">&nbsp;            game.setState(State.VALECUATRO);</b>
+&nbsp;            //winner gets 4 points
+&nbsp;        } else {
+<b class="nc">&nbsp;            awardPoints(gameID);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void callEnvido(Boolean desc, Long gameID) {
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+&nbsp;        //example player 1 calls envido meaning that you are saying you have matching suits
+&nbsp;        // you can also bluff (pretending you have matching suits)
+&nbsp;        //if player 2 says no to my envido then player one gets 1 points
+&nbsp;
+&nbsp;        //if player 2 says yes calculate who has the higher envido
+&nbsp;        //if he says yes the winnner of the calculation gets 2 points
+&nbsp;
+<b class="nc">&nbsp;        if (desc) {</b>
+<b class="nc">&nbsp;            game.setState(State.ENVIDO);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            awardPoints(gameID);</b>
+&nbsp;        }
+&nbsp;        // real envido makes it worth double onlt if he says yes
+&nbsp;        // so if he says no you still only get one point
+&nbsp;        //if he says yes than the winner gets 4 points
+&nbsp;    }
+&nbsp;
+&nbsp;    public void callRealEnvido(Boolean desc, Long gameID){
+<b class="nc">&nbsp;        Game game = gameRepository.findById((gameID))</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Game not found&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a game by its ID.
+&nbsp;     *
+&nbsp;     * @param gameId The ID of the game to be deleted.
+&nbsp;     */
+&nbsp;    public void deleteGame(Long gameId) {
+&nbsp;        // Retrieve the game by its ID
+<b class="nc">&nbsp;        Game game = gameRepository.findById(gameId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Game not found&quot;));</b>
+&nbsp;
+&nbsp;        // Delete the associated players
+<b class="nc">&nbsp;        List&lt;Player&gt; players = game.getPlayers();</b>
+<b class="nc">&nbsp;        playerRepository.deleteAll(players);</b>
+&nbsp;        // Delete the game
+<b class="nc">&nbsp;        gameRepository.delete(game);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Card getPlayedCard(Long gameId, Long playerID){
+<b class="nc">&nbsp;        Game game = gameRepository.findById(gameId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Game not found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return cardRepository.cardPlayedby(gameId, playerID);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

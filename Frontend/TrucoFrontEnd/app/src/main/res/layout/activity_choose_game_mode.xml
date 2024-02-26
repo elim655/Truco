@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- 1v1 Button -->
+    <Button
+        android:id="@+id/button1v1"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:text="1v1"
+        android:layout_marginBottom="16dp"
+        android:textColor="@android:color/white"/>
+
+    <!-- 2v2 Button -->
+    <Button
+        android:id="@+id/button2v2"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:text="2v2"
+        android:layout_marginBottom="16dp"
+        android:textColor="@android:color/white"/>
+
+    <!-- 3v3 Button -->
+    <Button
+        android:id="@+id/button3v3"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:text="3v3"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>

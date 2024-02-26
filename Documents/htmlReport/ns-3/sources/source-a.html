@@ -1,0 +1,329 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Player</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Player (com.backend.backend.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Player</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.5%
+  </span>
+  <span class="absValue">
+    (21/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88%
+  </span>
+  <span class="absValue">
+    (22/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.model;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+&nbsp;import com.fasterxml.jackson.annotation.JsonManagedReference;
+&nbsp;import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import jakarta.persistence.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Entity
+&nbsp;@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = &quot;id&quot;)
+&nbsp;public class Player {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    private Long id;
+&nbsp;
+&nbsp;    @ManyToOne
+&nbsp;    private GameRoom gameRoom;
+&nbsp;
+&nbsp;    private String playerName;
+&nbsp;    private boolean isHost;
+<b class="fc">&nbsp;    private boolean isReady = false;</b>
+&nbsp;    private int points;
+&nbsp;
+&nbsp;    private int team;
+&nbsp;
+&nbsp;    @OneToMany(mappedBy = &quot;player&quot;)
+&nbsp;    @JsonManagedReference
+&nbsp;    private List&lt;Card&gt; cards;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the list of cards held by the player.
+&nbsp;     *
+&nbsp;     * @return The list of cards held by the player.
+&nbsp;     */
+&nbsp;    public List&lt;Card&gt; getCards() {
+<b class="fc">&nbsp;        return cards;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set player cards&quot;, description = &quot;Sets the cards for the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setCards(List&lt;Card&gt; cards) {
+<b class="fc">&nbsp;        this.cards = cards;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @ManyToOne
+&nbsp;    @JoinColumn(name = &quot;game_id&quot;)
+&nbsp;    private Game game;
+&nbsp;
+&nbsp;    @OneToOne
+&nbsp;    @JoinColumn(name = &quot;username&quot;)
+&nbsp;    private User user;
+&nbsp;
+<b class="fc">&nbsp;    public Player() {</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resets the player&#39;s properties, removing associations with the game room and host status.
+&nbsp;     * This method is typically used to prepare a player for a new game.
+&nbsp;     */
+&nbsp;    public void reset() {
+<b class="nc">&nbsp;        this.gameRoom = null;</b>
+<b class="nc">&nbsp;        this.isHost = false;</b>
+<b class="nc">&nbsp;        this.isReady = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get player id&quot;, description = &quot;Returns the id of the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public Long getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set player id&quot;, description = &quot;Returns the id of the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setId(Long id) {
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get player game room&quot;, description = &quot;Returns the game room the player is in&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public GameRoom getGameRoom() {
+<b class="fc">&nbsp;        return gameRoom;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set game room&quot;, description = &quot;Sets the game room for the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setGameRoom(GameRoom gameRoom) {
+<b class="fc">&nbsp;        this.gameRoom = gameRoom;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get player name&quot;, description = &quot;Returns the name of the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public String getPlayerName() {
+<b class="fc">&nbsp;        return playerName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set player name&quot;, description = &quot;Sets the name of the player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setPlayerName(String playerName) {
+<b class="fc">&nbsp;        this.playerName = playerName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Game room host&quot;, description = &quot;Returns true if the player is the host of the game room&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public boolean isHost() {
+<b class="fc">&nbsp;        return isHost;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set game room host&quot;, description = &quot;If player becomes host then sets to true&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setHost(boolean host) {
+<b class="fc">&nbsp;        isHost = host;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Is player ready&quot;, description = &quot;Returns true if player is ready else false&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public boolean isReady() {
+<b class="fc">&nbsp;        return isReady;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set if player is ready&quot;, description = &quot;If player clicks ready then set ready to true&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setReady(boolean ready) {
+<b class="fc">&nbsp;        isReady = ready;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the user associated with the player.
+&nbsp;     *
+&nbsp;     * @return The user account associated with the player.
+&nbsp;     */
+&nbsp;    public User getUser() {
+<b class="fc">&nbsp;        return user;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the user associated with the player.
+&nbsp;     *
+&nbsp;     * @param user The user account to associate with the player.
+&nbsp;     */
+&nbsp;    public void setUser(User user) {
+<b class="fc">&nbsp;        this.user = user;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the number of points scored by the player in the game.
+&nbsp;     *
+&nbsp;     * @return The player&#39;s points.
+&nbsp;     */
+&nbsp;    public int getPoints() {
+<b class="fc">&nbsp;        return points;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the number of points scored by the player in the game.
+&nbsp;     *
+&nbsp;     * @param points The player&#39;s points.
+&nbsp;     */
+&nbsp;    public void setPoints(int points) {
+<b class="fc">&nbsp;        this.points = points;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the game associated with the player.
+&nbsp;     *
+&nbsp;     * @return The game in which the player is participating.
+&nbsp;     */
+&nbsp;    public Game getGame() {
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the game associated with the player.
+&nbsp;     *
+&nbsp;     * @param game The game in which the player is participating.
+&nbsp;     */
+&nbsp;    public void setGame(Game game) {
+<b class="fc">&nbsp;        this.game = game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getTeam() {
+<b class="fc">&nbsp;        return team;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTeam(int team) {
+<b class="fc">&nbsp;        this.team = team;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InvitationDTO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.model</a>
+</div>
+
+<h1>Coverage Summary for Class: InvitationDTO (com.backend.backend.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InvitationDTO</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.model;
+&nbsp;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;
+&nbsp;public class InvitationDTO {
+&nbsp;        private Long roomId;
+&nbsp;
+&nbsp;        private String sender;
+&nbsp;
+<b class="fc">&nbsp;    public InvitationDTO(Long roomId, String sender) {</b>
+<b class="fc">&nbsp;        this.roomId = roomId;</b>
+<b class="fc">&nbsp;        this.sender = sender;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get game room id&quot;, description = &quot;Returns the id of the game room&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public Long getRoomId() {
+<b class="fc">&nbsp;        return roomId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set game room id&quot;, description = &quot;Sets the game room id&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setRoomId(Long roomId) {
+<b class="fc">&nbsp;        this.roomId = roomId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get invitation sender&quot;, description = &quot;Returns who sent the invitation&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public String getSender() {
+<b class="fc">&nbsp;        return sender;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set invitation sender&quot;, description = &quot;Sets the sender of the invitation&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setSender(String sender) {
+<b class="fc">&nbsp;        this.sender = sender;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

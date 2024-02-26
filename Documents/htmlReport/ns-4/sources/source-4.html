@@ -1,0 +1,329 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TrucoGameServiceWebsocket</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.websocket</a>
+</div>
+
+<h1>Coverage Summary for Class: TrucoGameServiceWebsocket (com.backend.backend.websocket)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TrucoGameServiceWebsocket</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.websocket;
+&nbsp;
+&nbsp;import com.backend.backend.controller.*;
+&nbsp;import com.backend.backend.model.*;
+&nbsp;import com.backend.backend.repository.*;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import com.google.gson.JsonObject;
+&nbsp;import com.google.gson.JsonParseException;
+&nbsp;import com.google.gson.JsonParser;
+&nbsp;import jakarta.websocket.*;
+&nbsp;import jakarta.websocket.server.PathParam;
+&nbsp;import jakarta.websocket.server.ServerEndpoint;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextAware;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;@ServerEndpoint(&quot;/trucogame/{gameId}&quot;)
+&nbsp;@Component
+<b class="nc">&nbsp;public class TrucoGameServiceWebsocket implements ApplicationContextAware {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger logger = Logger.getLogger(TrucoGameServiceWebsocket.class.getName());</b>
+&nbsp;    private static ApplicationContext context;
+<b class="nc">&nbsp;    private Gson gson = new Gson();</b>
+&nbsp;
+&nbsp;    // Session management
+<b class="nc">&nbsp;    private static Map&lt;Session, Long&gt; sessionGameMap = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private static Map&lt;Long, Session&gt; gameSessionMap = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setApplicationContext(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;        TrucoGameServiceWebsocket.context = applicationContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private TrucoGameService getTrucoGameService() {
+<b class="nc">&nbsp;        return context.getBean(TrucoGameService.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private UserRepository getUserRepository() {
+<b class="nc">&nbsp;        return context.getBean(UserRepository.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private GameRepository getGameRepository() {
+<b class="nc">&nbsp;        return context.getBean(GameRepository.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private PlayerRepository getPlayerRepository() {
+<b class="nc">&nbsp;        return context.getBean(PlayerRepository.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private CardRepository getCardRepository() {
+<b class="nc">&nbsp;        return context.getBean(CardRepository.class);</b>
+&nbsp;    }
+&nbsp;    @OnOpen
+&nbsp;    public void onOpen(Session session, @PathParam(&quot;gameId&quot;) Long gameId) {
+<b class="nc">&nbsp;        logger.info(&quot;New WebSocket connection: Game ID - &quot; + gameId);</b>
+&nbsp;
+&nbsp;        // Associate the session with the game ID
+<b class="nc">&nbsp;        sessionGameMap.put(session, gameId);</b>
+<b class="nc">&nbsp;        gameSessionMap.put(gameId, session);</b>
+&nbsp;
+&nbsp;        // Send a welcome message
+<b class="nc">&nbsp;        sendMessage(session, &quot;Welcome to Truco Game &quot; + gameId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Broadcast a message to all sessions in the same game
+&nbsp;    private void broadcastMessage(String message, Long gameId) {
+<b class="nc">&nbsp;        sessionGameMap.forEach((session, storedGameId) -&gt; {</b>
+<b class="nc">&nbsp;            if (storedGameId.equals(gameId)) {</b>
+<b class="nc">&nbsp;                sendMessage(session, message);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    // Send a message to a specific session
+&nbsp;    private void sendMessage(Session session, String message) {
+&nbsp;        try {
+<b class="nc">&nbsp;            session.getBasicRemote().sendText(message);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            logger.severe(&quot;Error sending message: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnMessage
+&nbsp;    public void onMessage(Session session, String message) {
+<b class="nc">&nbsp;        JsonObject jsonMessage = JsonParser.parseString(message).getAsJsonObject();</b>
+<b class="nc">&nbsp;        String action = jsonMessage.get(&quot;action&quot;).getAsString();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (action) {</b>
+&nbsp;            case &quot;playCard&quot;:
+<b class="nc">&nbsp;                handlePlayCard(session, jsonMessage);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            // Additional cases for other actions
+&nbsp;            default:
+<b class="nc">&nbsp;                sendMessage(session, &quot;Unknown action: &quot; + action);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;//    private void handleCompareCard(Session session, JsonObject jsonMessage) {
+&nbsp;//        try {
+&nbsp;//            // Extract the game ID from the JSON message
+&nbsp;//            Long gameId = jsonMessage.get(&quot;gameId&quot;).getAsLong();
+&nbsp;//
+&nbsp;//            // Call the compareCard method in your game service
+&nbsp;//            Card winningCard = trucoGameService.compareCard(gameId);
+&nbsp;//
+&nbsp;//            // You can send a response back to the client if needed
+&nbsp;//            sendMessage(session, &quot;Comparison completed. Winning card: &quot; + winningCard.toString());
+&nbsp;//        } catch (Exception e) {
+&nbsp;//            e.printStackTrace();
+&nbsp;//            // Handle the exception and send an error message to the client if needed
+&nbsp;//            sendMessage(session, &quot;Error during card comparison: &quot; + e.getMessage());
+&nbsp;//        }
+&nbsp;//    }
+&nbsp;
+&nbsp;
+&nbsp;    private void handlePlayCard(Session session, JsonObject jsonMessage) {
+&nbsp;        try {
+&nbsp;            // Extract gameId from the session
+<b class="nc">&nbsp;            Long gameId = sessionGameMap.get(session);</b>
+<b class="nc">&nbsp;            if (gameId == null) {</b>
+<b class="nc">&nbsp;                sendMessage(session, &quot;Game ID not found for this session.&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Parse playerName and card details from the JSON message
+<b class="nc">&nbsp;            String playerName = jsonMessage.get(&quot;playerName&quot;).getAsString();</b>
+<b class="nc">&nbsp;            JsonObject cardJson = jsonMessage.getAsJsonObject(&quot;card&quot;);</b>
+<b class="nc">&nbsp;            Card card = gson.fromJson(cardJson, Card.class); // Assuming Card class is compatible with JSON structure</b>
+&nbsp;
+&nbsp;            // Get the TrucoGameService instance and call the playCard method
+<b class="nc">&nbsp;            TrucoGameService trucoGameService = getTrucoGameService();</b>
+<b class="nc">&nbsp;            trucoGameService.playCard(gameId, playerName, card);</b>
+&nbsp;
+&nbsp;            // Notify the player that the card was played successfully
+<b class="nc">&nbsp;            broadcastGameStateUpdate(gameId, card);</b>
+<b class="nc">&nbsp;            sendMessage(session, &quot;Card played successfully by &quot; + playerName);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            logger.severe(&quot;Error in handlePlayCard: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;            sendMessage(session, &quot;Error processing play card: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;//    private void handleCallTruco(Session session, JsonObject jsonMessage) {
+&nbsp;//        try {
+&nbsp;//            Boolean desc = jsonMessage.get(&quot;desc&quot;).getAsBoolean();
+&nbsp;//            Long gameId = jsonMessage.get(&quot;gameId&quot;).getAsLong();
+&nbsp;//
+&nbsp;//            // Implement the logic for calling Truco
+&nbsp;//            // Example: trucoGameService.callTruco(desc, gameId);
+&nbsp;//
+&nbsp;//            // You can send a response back to the client if needed
+&nbsp;//            sendMessage(session, &quot;Truco called successfully&quot;);
+&nbsp;//        } catch (Exception e) {
+&nbsp;//            e.printStackTrace();
+&nbsp;//        }
+&nbsp;//    }
+&nbsp;
+&nbsp;
+&nbsp;    @OnClose
+&nbsp;    public void onClose(Session session) {
+<b class="nc">&nbsp;        Long gameId = sessionGameMap.get(session);</b>
+<b class="nc">&nbsp;        sessionGameMap.remove(session);</b>
+<b class="nc">&nbsp;        gameSessionMap.remove(gameId);</b>
+&nbsp;
+<b class="nc">&nbsp;        logger.info(&quot;WebSocket connection closed: Game ID - &quot; + gameId);</b>
+&nbsp;        // Broadcast a message to other sessions if needed
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnError
+&nbsp;    public void onError(Session session, Throwable throwable) {
+<b class="nc">&nbsp;        logger.severe(&quot;WebSocket error for Game ID - &quot; + sessionGameMap.get(session) + &quot;: &quot; + throwable.getMessage());</b>
+&nbsp;        // Optionally, send an error message back to the client
+&nbsp;    }
+&nbsp;
+&nbsp;    private void broadcastGameStateUpdate(Long gameId, Card playedCard) {
+&nbsp;        // Create a JSON object representing the current game state
+<b class="nc">&nbsp;        JsonObject gameStateUpdate = new JsonObject();</b>
+<b class="nc">&nbsp;        gameStateUpdate.addProperty(&quot;action&quot;, &quot;gameStateUpdate&quot;);</b>
+<b class="nc">&nbsp;        gameStateUpdate.addProperty(&quot;playedCard&quot;, gson.toJson(playedCard)); // Convert the card to JSON</b>
+&nbsp;
+&nbsp;        // Add any other game state information as needed
+&nbsp;
+&nbsp;        // Broadcast the update to all players in the game
+<b class="nc">&nbsp;        broadcastMessage(gameStateUpdate.toString(), gameId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private void broadcastGameState(Long gameId) {
+&nbsp;        // Construct the game state message
+<b class="nc">&nbsp;        String gameStateMessage = constructGameStateMessage(gameId);</b>
+&nbsp;
+&nbsp;        // Broadcast the message to all sessions in the same game
+<b class="nc">&nbsp;        sessionGameMap.forEach((session, storedGameId) -&gt; {</b>
+<b class="nc">&nbsp;            if (storedGameId.equals(gameId)) {</b>
+<b class="nc">&nbsp;                sendMessage(session, gameStateMessage);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private String constructGameStateMessage(Long gameId) {
+&nbsp;        // Logic to construct a message with the current state of the game
+&nbsp;        // This could involve fetching the game state from the database
+&nbsp;        // and converting it to a JSON string, for example
+<b class="nc">&nbsp;        return &quot;{...}&quot;; // Replace with actual game state message</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

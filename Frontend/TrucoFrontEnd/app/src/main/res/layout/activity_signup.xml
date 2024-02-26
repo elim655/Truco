@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".SignupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- TRUCO Header -->
+        <TextView
+            android:id="@+id/headerSignup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TRUCO SIGN UP"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
+            android:layout_marginTop="32dp" />
+
+        <!-- Username EditText -->
+        <EditText
+            android:id="@+id/signupUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Username"
+            android:padding="10dp"
+            android:layout_marginTop="24dp"
+            android:background="#EDEDED" />
+
+        <!-- Password EditText -->
+        <EditText
+            android:id="@+id/signupPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:padding="10dp"
+            android:inputType="textPassword"
+            android:layout_marginTop="16dp"
+            android:background="#EDEDED" />
+
+        <!-- Signup Button -->
+        <Button
+            android:id="@+id/buttonSignup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
+            android:background="#FF0000" />
+
+        <!-- Redirect to Login TextView -->
+        <TextView
+            android:id="@+id/redirectToLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Already have an account? Login"
+            android:textColor="#FF0000" />
+
+    </LinearLayout>
+</ScrollView>

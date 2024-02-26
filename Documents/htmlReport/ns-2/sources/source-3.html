@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SettingsController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: SettingsController (com.backend.backend.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SettingsController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.8%
+  </span>
+  <span class="absValue">
+    (5/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.controller;
+&nbsp;
+&nbsp;import com.backend.backend.model.Settings;
+&nbsp;import com.backend.backend.repository.SettingsRepository;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/settings&quot;)
+&nbsp;@Tag(name = &quot;Settings API&quot;)
+&nbsp;public class SettingsController {
+&nbsp;
+&nbsp;    private final SettingsRepository settingsRepository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public SettingsController(SettingsRepository settingsRepository) {</b>
+<b class="fc">&nbsp;        this.settingsRepository = settingsRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get settings info&quot;, description = &quot;Get information settings&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Settings&gt; getSettings(@PathVariable Long id) {
+<b class="fc">&nbsp;        Optional&lt;Settings&gt; settings = settingsRepository.findById(id);</b>
+<b class="fc">&nbsp;        return settings.map(ResponseEntity::ok)</b>
+<b class="fc">&nbsp;                .orElse(ResponseEntity.notFound().build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Create Setting&quot;, description = &quot;Create New Settings data&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;Settings&gt; createSettings(@RequestBody Settings newSettings) {
+<b class="nc">&nbsp;        Settings savedSettings = settingsRepository.save(newSettings);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(savedSettings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Update settings&quot;, description = &quot;Modify information inside the specific {id} settings&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Settings&gt; updateSettings(@PathVariable Long id, @RequestBody Settings updatedSettings) {
+<b class="nc">&nbsp;        Optional&lt;Settings&gt; existingSettings = settingsRepository.findById(id);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existingSettings.isPresent()) {</b>
+<b class="nc">&nbsp;            Settings settings = existingSettings.get();</b>
+<b class="nc">&nbsp;            settings.setVolume(updatedSettings.getVolume());</b>
+<b class="nc">&nbsp;            settings.setLanguage(updatedSettings.getLanguage());</b>
+<b class="nc">&nbsp;            settings.setSurrender(updatedSettings.isSurrender());</b>
+&nbsp;
+<b class="nc">&nbsp;            settingsRepository.save(settings);</b>
+<b class="nc">&nbsp;            return ResponseEntity.ok(settings);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.notFound().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Delete Settings&quot;, description = &quot;Delete the settings informtion&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteSettings(@PathVariable Long id) {
+<b class="nc">&nbsp;        settingsRepository.deleteById(id);</b>
+<b class="nc">&nbsp;        return ResponseEntity.noContent().build();</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

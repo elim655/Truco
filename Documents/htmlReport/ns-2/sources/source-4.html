@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TrucoGameController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: TrucoGameController (com.backend.backend.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TrucoGameController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.9%
+  </span>
+  <span class="absValue">
+    (12/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.controller;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import com.backend.backend.model.*;
+&nbsp;
+&nbsp;import com.backend.backend.repository.CardRepository;
+&nbsp;import com.backend.backend.repository.GameRepository;
+&nbsp;import com.backend.backend.repository.PlayerRepository;
+&nbsp;import com.backend.backend.repository.UserRepository;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controller class for handling Truco game-related operations.
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/truco&quot;)
+&nbsp;@Tag(name = &quot;Truco Game API&quot;)
+<b class="fc">&nbsp;public class TrucoGameController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private TrucoGameService trucoGameService;
+&nbsp;    @Autowired
+&nbsp;    UserRepository userRepository;
+&nbsp;    @Autowired
+&nbsp;    GameRepository gameRepository;
+&nbsp;    @Autowired
+&nbsp;    PlayerRepository playerRepository;
+&nbsp;    @Autowired
+&nbsp;    CardRepository cardRepository;
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Start a 1v1 game&quot;, description = &quot;Initialized a 1v1 truco game between 2 users&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/newgame/1v1/{player1}/{player2}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; start1v1(@PathVariable String player1, @PathVariable String player2) {
+<b class="nc">&nbsp;        if (player1.equals(player2)) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Cannot start a game with the same player for both positions.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        User user1 = userRepository.findByUsername(player1);</b>
+<b class="nc">&nbsp;        User user2 = userRepository.findByUsername(player2);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (user1 == null) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Player 1 doesn&#39;t exist.&quot;);</b>
+<b class="nc">&nbsp;        } else if (user2 == null) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;Player 2 doesn&#39;t exist.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            trucoGameService.initialize1v1Game(player1, player2);</b>
+&nbsp;            // Assuming the game object has an ID and other details you want to return
+<b class="nc">&nbsp;            return ResponseEntity.ok(&quot;New game created&quot;);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace(); // Not recommended for production, use a logger instead</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;An error occurred while starting the game.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get player cards&quot;, description = &quot;Returns a list of cards a player currently has in a game&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @GetMapping(&quot;/cards/{gameID}/{player}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;Card&gt;&gt; getPlayerCards(@PathVariable String player, @PathVariable Long gameID) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Player foundPlayer = playerRepository.findByPlayerName(player);</b>
+<b class="fc">&nbsp;            if (foundPlayer == null) {</b>
+&nbsp;                // Player not found
+<b class="nc">&nbsp;                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            List&lt;Card&gt; cards = cardRepository.findCardsByPlayerIdAndGameId(foundPlayer.getId(), gameID);</b>
+<b class="fc">&nbsp;            if (cards.isEmpty()) {</b>
+&nbsp;                // No cards found for player in the specified game
+<b class="nc">&nbsp;                return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return new ResponseEntity&lt;&gt;(cards, HttpStatus.OK);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;            // Log the exception
+<b class="nc">&nbsp;            e.printStackTrace();  // Replace with a logger if available</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Play a card&quot;, description = &quot;A player plays a card if it is their turn and they have that card&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/playcard/{gameid}/{player}&quot;)
+&nbsp;    public ResponseEntity&lt;?&gt; playCard(@PathVariable Long gameid, @PathVariable String player, @RequestBody Card card) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Player playerEntity = playerRepository.findByPlayerName(player);</b>
+<b class="fc">&nbsp;            if (playerEntity == null) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Player not found&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (playerEntity.getGame().getId() != (gameid)) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Player is not part of the game with the given ID&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            trucoGameService.playCard(gameid, player, card);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok().build();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;            // Handle different types of exceptions differently as per your business logic.
+<b class="nc">&nbsp;            return ResponseEntity.internalServerError().body(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Determine round winner&quot;, description = &quot;Compares the two cards played by both players and gives points to the winner&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/comparecard/{gameid}&quot;)
+&nbsp;    public Card compareCard(@PathVariable Long gameid) {
+<b class="fc">&nbsp;        return trucoGameService.compareCard(gameid);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get game id of player&quot;, description = &quot;Returns the game id that is associated with a player&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @GetMapping(&quot;/gameid/{player}&quot;)
+&nbsp;    public Long getGameId(@PathVariable String player) {
+<b class="nc">&nbsp;        return playerRepository.findByPlayerName(player).getGame().getId();</b>
+&nbsp;    }
+&nbsp;    @PostMapping(&quot;/callflor/{gameid}/{player}&quot;)
+&nbsp;    public void callFlor(@PathVariable Long gameid, @PathVariable String player){
+<b class="nc">&nbsp;        trucoGameService.callFlor(gameid, player);</b>
+&nbsp;    }
+&nbsp;    @PostMapping(&quot;/calltruco/{decision}/{gameID}&quot;)
+&nbsp;    public void callTruco(@PathVariable Boolean decision, @PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.callTruco(decision, gameID);</b>
+&nbsp;    }
+&nbsp;    @PostMapping(&quot;/callretruco/{decision}/{gameID}&quot;)
+&nbsp;    public void callRetruco(@PathVariable Boolean decision, @PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.callReTruco(decision, gameID);</b>
+&nbsp;    }
+&nbsp;    @PostMapping(&quot;callvalequatro/{decision}/{gameID}&quot;)
+&nbsp;    public void callValeQuatro(@PathVariable Boolean decision, @PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.callValeQuatro(decision, gameID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;callenvido/{decision}/{gameID}&quot;)
+&nbsp;    public void callEnvido(@PathVariable Boolean decision, @PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.callEnvido(decision, gameID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;callrealenvido/{decision}/{gameID}&quot;)
+&nbsp;    public void callRealEnvido(@PathVariable Boolean decision, @PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.callRealEnvido(decision, gameID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;deletegame/{gameID}&quot;)
+&nbsp;    public void deleteGame(@PathVariable Long gameID){
+<b class="nc">&nbsp;        trucoGameService.deleteGame(gameID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;points/{player}&quot;)
+<b class="nc">&nbsp;    public int getPoints(@PathVariable String player){ return playerRepository.findByPlayerName(player).getPoints(); }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player_box"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="48dp"
+    android:gravity="center"
+    android:layout_margin="8dp"
+    android:background="@drawable/player_box_background">
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Player X"
+        android:textSize="20sp" />
+
+<!--    <Button-->
+<!--        android:id="@+id/join_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Join"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:visibility="visible"/>-->
+
+    <Button
+        android:id="@+id/ready_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ready"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/invite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Invite"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"/>
+
+
+</LinearLayout>

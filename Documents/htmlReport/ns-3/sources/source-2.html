@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Deck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Deck (com.backend.backend.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Deck</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (5/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.model;
+&nbsp;
+&nbsp;import io.swagger.v3.oas.annotations.media.Schema;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a deck of playing cards in the game.
+&nbsp; */
+&nbsp;@Entity
+&nbsp;public class Deck {
+&nbsp;
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    @Schema(name = &quot;Deck ID&quot;)
+&nbsp;    private Long id;
+&nbsp;
+<b class="fc">&nbsp;    @OneToMany(mappedBy = &quot;deck&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</b>
+&nbsp;    @Schema(name = &quot;Card List&quot;)
+&nbsp;    private List&lt;Card&gt; cards = new ArrayList&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;    public Deck(){}</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public Deck(Game game) {</b>
+&nbsp;        // Initialize the deck with cards and associate them with the game and deck itself.
+<b class="nc">&nbsp;        for (String suit : Card.SUITS) {</b>
+<b class="nc">&nbsp;            for (int number = 1; number &lt;= 12; number++) {</b>
+<b class="nc">&nbsp;                Card card = new Card(suit, number);</b>
+<b class="nc">&nbsp;                cards.add(card);</b>
+<b class="nc">&nbsp;                card.setGame(game);</b>
+<b class="nc">&nbsp;                card.setDeck(this);</b>
+<b class="nc">&nbsp;                card.setCardPlayed(false);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        shuffleDeck(); // Shuffle the deck after initializing it.</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get cards&quot;, description = &quot;Returns the cards in the deck&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public List&lt;Card&gt; getCards() {
+<b class="fc">&nbsp;        return cards;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get deck id&quot;, description = &quot;Returns the id of the deck&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public Long getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Set deck id&quot;, description = &quot;Sets the id of the deck&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void setId(Long id) {
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Shuffles deck&quot;, description = &quot;Randomly shuffles cards in deck so its random&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    public void shuffleDeck() {
+<b class="nc">&nbsp;        Collections.shuffle(cards);</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>

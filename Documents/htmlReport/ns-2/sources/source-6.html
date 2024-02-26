@@ -1,0 +1,520 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.backend.backend.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: UserController (com.backend.backend.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.9%
+  </span>
+  <span class="absValue">
+    (55/149)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.backend.backend.controller;
+&nbsp;
+&nbsp;import com.backend.backend.model.FriendRequest;
+&nbsp;import com.backend.backend.model.Player;
+&nbsp;import com.backend.backend.model.User;
+&nbsp;import com.backend.backend.model.UserDTO;
+&nbsp;import com.backend.backend.repository.*;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import io.swagger.v3.oas.annotations.tags.Tag;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/users&quot;)
+&nbsp;@Tag(name = &quot;User API&quot;)
+<b class="fc">&nbsp;public class UserController {</b>
+&nbsp;    @Autowired
+&nbsp;    UserRepository userRepository;
+&nbsp;    @Autowired
+&nbsp;    FriendRequestRepository friendRequestRepository;
+&nbsp;    @Autowired
+&nbsp;    PlayerRepository playerRepository;
+&nbsp;    @Autowired
+&nbsp;    InvitationRepository invitationRepository;
+&nbsp;    @Autowired
+&nbsp;    GameRoomRepository gameRoomRepository;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Endpoint to retrieve user details by username.
+&nbsp;     *
+&nbsp;     * @param username The username of the user to retrieve.
+&nbsp;     * @return ResponseEntity containing UserDTO if found, or a not found response.
+&nbsp;     */
+&nbsp;    @Operation(summary = &quot;Get Specific User ID&quot;, description = &quot;Get information about a specific user&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @GetMapping(&quot;/{username}&quot;)
+&nbsp;    public ResponseEntity&lt;UserDTO&gt; getUserById(@PathVariable String username) {
+<b class="fc">&nbsp;        Optional&lt;User&gt; userOptional = Optional.ofNullable(userRepository.findByUsername(username));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (userOptional.isPresent()) {</b>
+<b class="fc">&nbsp;            User user = userOptional.get();</b>
+<b class="fc">&nbsp;            UserDTO userDTO = new UserDTO();</b>
+<b class="fc">&nbsp;            userDTO.setId(user.getId());</b>
+<b class="fc">&nbsp;            userDTO.setUsername(user.getUsername());</b>
+&nbsp;
+<b class="fc">&nbsp;            Set&lt;String&gt; friendUser = user.getFriends().stream()</b>
+<b class="fc">&nbsp;                    .map(User::getUsername)</b>
+<b class="fc">&nbsp;                    .collect(Collectors.toSet());</b>
+<b class="fc">&nbsp;            userDTO.setFriendUsername(friendUser);</b>
+&nbsp;
+<b class="fc">&nbsp;            List&lt;String&gt; sentRequests = user.getSentFriendRequests().stream()</b>
+<b class="fc">&nbsp;                    .map(request -&gt; request.getReceiver().getUsername())</b>
+<b class="fc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;            userDTO.setSentFriendRequest(sentRequests);</b>
+&nbsp;
+<b class="fc">&nbsp;            List&lt;String&gt; receivedRequests = user.getReceivedFriendRequests().stream()</b>
+<b class="fc">&nbsp;                    .map(request -&gt; request.getSender().getUsername())</b>
+<b class="fc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;            userDTO.setReceivedFriendRequest(receivedRequests);</b>
+&nbsp;
+<b class="fc">&nbsp;            List&lt;Long&gt; Invitation = user.getReceivedInvitations().stream()</b>
+<b class="fc">&nbsp;                    .map(request -&gt; request.getRoom().getId())</b>
+<b class="fc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;            userDTO.setReceivedInvitation(Invitation);</b>
+&nbsp;
+<b class="fc">&nbsp;            return ResponseEntity.ok().body(userDTO);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.notFound().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Get all users&quot;, description = &quot;Returns a list of all users&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @GetMapping(&quot;/all&quot;)
+&nbsp;    public List&lt;UserDTO&gt; getAllUsers() {
+<b class="fc">&nbsp;        List&lt;User&gt; users = userRepository.findAll();</b>
+<b class="fc">&nbsp;        List&lt;UserDTO&gt; userDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (User user : users) {</b>
+<b class="nc">&nbsp;            UserDTO userDTO = new UserDTO();</b>
+<b class="nc">&nbsp;            userDTO.setId(user.getId());</b>
+<b class="nc">&nbsp;            userDTO.setUsername(user.getUsername());</b>
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;String&gt; friendUser = user.getFriends().stream()</b>
+<b class="nc">&nbsp;                    .map(User::getUsername)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;            userDTO.setFriendUsername(friendUser);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; sentRequests = user.getSentFriendRequests().stream()</b>
+<b class="nc">&nbsp;                    .map(request -&gt; request.getReceiver().getUsername())</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            userDTO.setSentFriendRequest(sentRequests);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; receivedRequests = user.getReceivedFriendRequests().stream()</b>
+<b class="nc">&nbsp;                    .map(request -&gt; request.getSender().getUsername())</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            userDTO.setReceivedFriendRequest(receivedRequests);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;Long&gt; Invitation = user.getReceivedInvitations().stream()</b>
+<b class="nc">&nbsp;                    .map(request -&gt; request.getRoom().getId())</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            userDTO.setReceivedInvitation(Invitation);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            userDTOs.add(userDTO);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return userDTOs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Create new user&quot;, description = &quot;Creates a user with path&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/post&quot;)
+&nbsp;    User PostUserByPath(@RequestBody User newUser){
+<b class="fc">&nbsp;        userRepository.save(newUser);</b>
+<b class="fc">&nbsp;        return newUser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Add a friend&quot;, description = &quot;Sends a friend request to a user&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/{username}/add/{friendName}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; addFriend(@PathVariable String username, @PathVariable String friendName) {
+<b class="fc">&nbsp;        Optional&lt;User&gt; userOptional = Optional.ofNullable(userRepository.findByUsername(username));</b>
+<b class="fc">&nbsp;        Optional&lt;User&gt; friendOptional = Optional.ofNullable(userRepository.findByUsername(friendName));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (userOptional.isPresent() &amp;&amp; friendOptional.isPresent()) {</b>
+<b class="fc">&nbsp;            User user = userOptional.get();</b>
+<b class="fc">&nbsp;            User friend = friendOptional.get();</b>
+&nbsp;
+&nbsp;            // Check if the users are not already friends
+<b class="fc">&nbsp;            if (user.equals(friend)) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;You cannot add yourself as a friend.&quot;);</b>
+<b class="fc">&nbsp;            } else if (user.getFriends().contains(friend)) {</b>
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Users are already friends.&quot;);</b>
+&nbsp;            } else {
+&nbsp;                // Check if there is an existing friend request from user to friend
+<b class="fc">&nbsp;                boolean isDuplicateRequest = user.getSentFriendRequests().stream()</b>
+<b class="fc">&nbsp;                        .anyMatch(request -&gt; request.getReceiver().equals(friend) &amp;&amp; request.getStatus().equals(&quot;Pending&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;                if (isDuplicateRequest) {</b>
+<b class="nc">&nbsp;                    return ResponseEntity.badRequest().body(&quot;You have already sent a friend request to &quot; + friendName + &quot;.&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                FriendRequest friendRequest = new FriendRequest(user, friend);</b>
+<b class="fc">&nbsp;                friendRequestRepository.save(friendRequest);</b>
+<b class="fc">&nbsp;                user.setSentFriendRequests(friendRequest);</b>
+<b class="fc">&nbsp;                friend.setReceivedFriendRequests(friendRequest);</b>
+&nbsp;
+<b class="fc">&nbsp;                friendRequest.setStatus(&quot;Pending&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;                return ResponseEntity.ok(&quot;Friend request sent successfully.&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(friendName + &quot; is not found&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Accept friend request&quot;, description = &quot;A user accepts a friend request and adds the sender to their friends list&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/{username}/accept/{requestUser}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; acceptFriendRequest(@PathVariable String username, @PathVariable String requestUser) {
+<b class="nc">&nbsp;        Optional&lt;User&gt; userOptional = Optional.ofNullable(userRepository.findByUsername(username));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (userOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            User user = userOptional.get();</b>
+&nbsp;
+&nbsp;            // Manually search for the user with the specified username
+<b class="nc">&nbsp;            User friendRequestUser = userRepository.findByUsername(requestUser);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (friendRequestUser != null) {</b>
+&nbsp;                // Check if there is a pending friend request from requestUser to userId
+<b class="nc">&nbsp;                Optional&lt;FriendRequest&gt; friendRequestOptional = user.getReceivedFriendRequests().stream()</b>
+<b class="nc">&nbsp;                        .filter(request -&gt; request.getSender().equals(friendRequestUser) &amp;&amp; request.getStatus().equals(&quot;Pending&quot;))</b>
+<b class="nc">&nbsp;                        .findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (friendRequestOptional.isPresent()) {</b>
+&nbsp;                    // Accept the friend request
+<b class="nc">&nbsp;                    FriendRequest friendRequest = friendRequestOptional.get();</b>
+<b class="nc">&nbsp;                    friendRequest.setStatus(&quot;Accepted&quot;);</b>
+&nbsp;
+&nbsp;                    // Add each other as friends
+<b class="nc">&nbsp;                    user.getFriends().add(friendRequestUser);</b>
+<b class="nc">&nbsp;                    friendRequestUser.getFriends().add(user);</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;                    // Save the changes
+<b class="nc">&nbsp;                    userRepository.save(user);</b>
+<b class="nc">&nbsp;                    userRepository.save(friendRequestUser);</b>
+&nbsp;
+&nbsp;                    // Delete the friend request from the repository
+<b class="nc">&nbsp;                    friendRequestRepository.delete(friendRequest);</b>
+&nbsp;
+<b class="nc">&nbsp;                    return ResponseEntity.ok(&quot;Friend request accepted successfully.&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return ResponseEntity.badRequest().body(&quot;No pending friend request from &quot; + requestUser + &quot;.&quot;);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(requestUser + &quot; is not found&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(username + &quot; is not found&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;//    @PostMapping(&quot;/{userId}/accept/{requestId}&quot;)
+&nbsp;//    public ResponseEntity&lt;String&gt; acceptFriendRequest(@PathVariable Long userId, @PathVariable String requestUser) {
+&nbsp;//        Optional&lt;User&gt; userOptional = userRepository.findById(userId);
+&nbsp;//        Optional&lt;FriendRequest&gt; requestOptional = friendRequestRepository.findbyId(requestId);
+&nbsp;//
+&nbsp;//        if (userOptional.isPresent() &amp;&amp; requestOptional.isPresent()) {
+&nbsp;//            User user = userOptional.get();
+&nbsp;//            FriendRequest friendRequest = requestOptional.get();
+&nbsp;//
+&nbsp;//            // Check if the user is the receiver of the friend request
+&nbsp;//            if (user.equals(friendRequest.getReceiver()) &amp;&amp; friendRequest.getStatus().equals(&quot;Pending&quot;)) {
+&nbsp;//                // Update the friend request status to &quot;Accepted&quot;
+&nbsp;//                friendRequest.setStatus(&quot;Accepted&quot;);
+&nbsp;//                friendRequestRepository.save(friendRequest);
+&nbsp;//
+&nbsp;//                // Add the sender as a friend of the receiver and vice versa
+&nbsp;//                User sender = friendRequest.getSender();
+&nbsp;//                user.getFriends().add(sender);
+&nbsp;//                sender.getFriends().add(user);
+&nbsp;//
+&nbsp;//                userRepository.save(user);
+&nbsp;//                userRepository.save(sender);
+&nbsp;//
+&nbsp;//                return ResponseEntity.ok(&quot;Friend request accepted successfully.&quot;);
+&nbsp;//            } else {
+&nbsp;//                return ResponseEntity.badRequest().body(&quot;Invalid friend request or already accepted.&quot;);
+&nbsp;//            }
+&nbsp;//        } else {
+&nbsp;//            return ResponseEntity.notFound().build();
+&nbsp;//        }
+&nbsp;//    }
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Decline friend request&quot;, description = &quot;Declines a friend request &quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @PostMapping(&quot;/{username}/decline/{requestUser}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; declineFriendRequest(@PathVariable String username, @PathVariable String requestUser) {
+<b class="nc">&nbsp;        Optional&lt;User&gt; userOptional = Optional.ofNullable(userRepository.findByUsername(username));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (userOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            User user = userOptional.get();</b>
+&nbsp;
+&nbsp;            // Manually search for the user with the specified username
+<b class="nc">&nbsp;            User friendRequestUser = userRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                    .filter(u -&gt; u.getUsername().equals(requestUser))</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (friendRequestUser != null) {</b>
+&nbsp;                // Check if there is a pending friend request from requestUser to userId
+<b class="nc">&nbsp;                Optional&lt;FriendRequest&gt; friendRequestOptional = user.getReceivedFriendRequests().stream()</b>
+<b class="nc">&nbsp;                        .filter(request -&gt; request.getSender().equals(friendRequestUser) &amp;&amp; request.getStatus().equals(&quot;Pending&quot;))</b>
+<b class="nc">&nbsp;                        .findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (friendRequestOptional.isPresent()) {</b>
+&nbsp;                    // Decline the friend request
+<b class="nc">&nbsp;                    FriendRequest friendRequest = friendRequestOptional.get();</b>
+<b class="nc">&nbsp;                    friendRequest.setStatus(&quot;Declined&quot;);</b>
+&nbsp;
+&nbsp;                    // Remove the declined friend request
+<b class="nc">&nbsp;                    user.getReceivedFriendRequests().remove(friendRequest);</b>
+<b class="nc">&nbsp;                    friendRequestUser.getSentFriendRequests().remove(friendRequest);</b>
+&nbsp;
+&nbsp;                    // Save the changes
+<b class="nc">&nbsp;                    userRepository.save(user);</b>
+<b class="nc">&nbsp;                    userRepository.save(friendRequestUser);</b>
+<b class="nc">&nbsp;                    friendRequestRepository.delete(friendRequest);</b>
+&nbsp;
+<b class="nc">&nbsp;                    return ResponseEntity.ok(&quot;Friend request declined successfully.&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return ResponseEntity.badRequest().body(&quot;No pending friend request from &quot; + requestUser + &quot;.&quot;);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(requestUser + &quot; is not found&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(username + &quot; is not found&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a friend from the user&#39;s friend list.
+&nbsp;     *
+&nbsp;     * @param username    The username of the user removing the friend.
+&nbsp;     * @param friendUser  The username of the friend to be removed.
+&nbsp;     * @return ResponseEntity with a success message or error message if unsuccessful.
+&nbsp;     */
+&nbsp;
+&nbsp;    @Operation(summary = &quot;Delete Friend&quot;, description = &quot;Delete user from friendlist&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @DeleteMapping(&quot;/{username}/delete/{friendUser}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; deleteFriend(@PathVariable String username, @PathVariable String friendUser) {
+<b class="nc">&nbsp;        Optional&lt;User&gt; userOptional = Optional.ofNullable(userRepository.findByUsername(username));</b>
+<b class="nc">&nbsp;        Optional&lt;User&gt; friendOptional = Optional.ofNullable(userRepository.findByUsername(friendUser));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (userOptional.isPresent() &amp;&amp; friendOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            User user = userOptional.get();</b>
+<b class="nc">&nbsp;            User friend = friendOptional.get();</b>
+&nbsp;
+&nbsp;            // Check if the users are friends
+<b class="nc">&nbsp;            if (user.getFriends().contains(friend) &amp;&amp; friend.getFriends().contains(user)) {</b>
+&nbsp;                // Remove the friendship relationship
+<b class="nc">&nbsp;                user.getFriends().remove(friend);</b>
+<b class="nc">&nbsp;                friend.getFriends().remove(user);</b>
+&nbsp;
+<b class="nc">&nbsp;                userRepository.save(user);</b>
+<b class="nc">&nbsp;                userRepository.save(friend);</b>
+&nbsp;
+<b class="nc">&nbsp;                return ResponseEntity.ok(&quot;Friendship deleted successfully.&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return ResponseEntity.badRequest().body(&quot;Users are not friends.&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(friendUser + &quot; is not in your friend list&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a user and related records from the database.
+&nbsp;     *
+&nbsp;     * @param user The username of the user to be deleted.
+&nbsp;     * @return ResponseEntity with a success message or error message if unsuccessful.
+&nbsp;     */
+&nbsp;    @Operation(summary = &quot;Delete User&quot;, description = &quot;Delete all related information about this user&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successfully retrieved&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Not found - The product was not found&quot;)
+&nbsp;    })
+&nbsp;    @DeleteMapping(&quot;/delete/{user}&quot;)
+&nbsp;    @Transactional
+&nbsp;    public ResponseEntity&lt;String&gt; deleteUser(@PathVariable String user) {
+<b class="fc">&nbsp;        User userToDelete = userRepository.findByUsername(user);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (userToDelete != null) {</b>
+&nbsp;
+&nbsp;
+&nbsp;            // delete invitation
+<b class="fc">&nbsp;            invitationRepository.deleteByReceiver(userToDelete);</b>
+&nbsp;            // Remove the user from friends&#39; lists
+<b class="fc">&nbsp;            for (User friend : userToDelete.getFriends()) {</b>
+<b class="nc">&nbsp;                friend.getFriends().remove(userToDelete);</b>
+<b class="nc">&nbsp;                userRepository.save(friend);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // Find the related Player record
+<b class="fc">&nbsp;            Player playerToDelete = playerRepository.findByUser(userToDelete);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (playerToDelete != null) {</b>
+<b class="nc">&nbsp;                if(playerToDelete.getGameRoom() != null){</b>
+<b class="nc">&nbsp;                    List&lt;Player&gt; playersInRoom = playerRepository.findByGameRoomId(playerToDelete.getGameRoom().getId());</b>
+<b class="nc">&nbsp;                    if (playerToDelete.isHost()) {</b>
+&nbsp;                        // If the player is the host, remove all players from the room and delete it
+<b class="nc">&nbsp;                        for(Player p : playersInRoom){</b>
+<b class="nc">&nbsp;                            p.reset();</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                        gameRoomRepository.delete(playerToDelete.getGameRoom());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;
+&nbsp;                // Delete the related Player record
+<b class="nc">&nbsp;                playerRepository.delete(playerToDelete);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Delete related FriendRequest records
+<b class="fc">&nbsp;            friendRequestRepository.deleteBySenderOrReceiver(userToDelete, userToDelete);</b>
+&nbsp;
+&nbsp;            // Now delete the user
+<b class="fc">&nbsp;            userRepository.delete(userToDelete);</b>
+&nbsp;
+<b class="fc">&nbsp;            return ResponseEntity.ok(&quot;User and related records deleted successfully.&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(&quot;User not found in the database.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-08 15:58</div>
+</div>
+</body>
+</html>
